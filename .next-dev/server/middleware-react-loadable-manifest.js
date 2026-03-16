@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"app\\\\(app)\\\\search\\\\[id]\\\\page.tsx -> html2canvas\":{\"id\":\"app\\\\(app)\\\\search\\\\[id]\\\\page.tsx -> html2canvas\",\"files\":[\"static/chunks/_app-pages-browser_node_modules_html2canvas_dist_html2canvas_js.js\"]}}"
