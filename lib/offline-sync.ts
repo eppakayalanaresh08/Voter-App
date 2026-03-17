@@ -65,7 +65,10 @@ export async function syncPending() {
   });
 
   const json: SyncResponse = await res.json();
-  if (!res.ok) throw new Error(json.error ?? 'Sync failed');
+  if (!res.ok) {
+    console.error('[Sync] Server returned error:', json.error);
+    throw new Error(json.error ?? 'Sync failed');
+  }
 
   // Clear pending queues (keep conflicts for later improvement)
   await db.transaction('rw', db.pendingEdits, db.pendingLogs, async () => {

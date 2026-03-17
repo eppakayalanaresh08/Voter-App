@@ -3,9 +3,9 @@
 import NextLink from 'next/link';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import CallRoundedIcon from '@mui/icons-material/CallRounded';
+import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import MeetingRoomRoundedIcon from '@mui/icons-material/MeetingRoomRounded';
 import PinDropRoundedIcon from '@mui/icons-material/PinDropRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -33,18 +33,29 @@ type SearchResponse = {
   booths?: Array<{ boothNo: string | null; boothName: string | null }>;
 };
 
-type FilterKey = 'boothNo' | 'voterName' | 'houseNo' | 'epicId' | 'boothName' | 'phoneNumber';
+type FilterKey = 'age' | 'voterName' | 'houseNo' | 'epicId' | 'boothName' | 'phoneNumber';
 
-type SearchFilters = Record<FilterKey, string>;
+type SearchFilters = Record<Exclude<FilterKey, 'age'>, string> & {
+  age: string;
+};
 
 const EMPTY_FILTERS: SearchFilters = {
-  boothNo: '',
+  age: '',
   voterName: '',
   houseNo: '',
   epicId: '',
   boothName: '',
   phoneNumber: ''
 };
+
+const AGE_RANGES = [
+  { label: '18-24', min: 18, max: 24 },
+  { label: '25-34', min: 25, max: 34 },
+  { label: '35-44', min: 35, max: 44 },
+  { label: '45-59', min: 45, max: 59 },
+  { label: '60-74', min: 60, max: 74 },
+  { label: '75+', min: 75, max: 150 }
+];
 
 /** How many results to show per page */
 const PAGE_SIZE = 20;
@@ -60,11 +71,11 @@ const FILTER_ITEMS: Array<{
   icon: React.ReactNode;
 }> = [
   {
-    key: 'boothNo',
-    label: 'Booth No',
-    placeholder: 'Enter booth number',
-    helper: 'Search assigned voters by booth number.',
-    icon: <MeetingRoomRoundedIcon fontSize="small" />
+    key: 'age',
+    label: 'Age',
+    placeholder: 'Select age range',
+    helper: 'Filter voters by age group.',
+    icon: <CalendarMonthRoundedIcon fontSize="small" />
   },
   {
     key: 'voterName',
@@ -116,7 +127,13 @@ function hasActiveFilters(filters: SearchFilters) {
 }
 
 function matchesOfflineFilters(voter: OfflineVoter, filters: SearchFilters) {
-  if (filters.boothNo && !normalizeText(voter.booth_no).includes(normalizeText(filters.boothNo))) return false;
+  if (filters.age) {
+    const range = AGE_RANGES.find(r => r.label === filters.age);
+    if (range) {
+      const age = voter.age ?? 0;
+      if (age < range.min || age > range.max) return false;
+    }
+  }
   if (
     filters.voterName &&
     !normalizeText(voter.voter_name).includes(normalizeText(filters.voterName)) &&
@@ -236,7 +253,15 @@ export default function SearchPage() {
       try {
         const params = new URLSearchParams();
         for (const [key, value] of Object.entries(nextFilters)) {
-          if (value.trim()) params.set(key, value.trim());
+          if (key === 'age' && value) {
+            const range = AGE_RANGES.find(r => r.label === value);
+            if (range) {
+              params.set('ageMin', range.min.toString());
+              params.set('ageMax', range.max.toString());
+            }
+          } else if (value.trim()) {
+            params.set(key, value.trim());
+          }
         }
 
         const res = await fetch(`/api/voters/search?${params.toString()}`, { signal });
@@ -404,7 +429,21 @@ export default function SearchPage() {
                     )}
                   </Stack>
 
-                  {activeFilter === 'boothName' ? (
+                  {activeFilter === 'age' ? (
+                    <TextField
+                      select
+                      fullWidth
+                      value={filters.age}
+                      onChange={(e) => setFilters((prev) => ({ ...prev, age: e.target.value }))}
+                    >
+                      <MenuItem value="">Select age range</MenuItem>
+                      {AGE_RANGES.map((range) => (
+                        <MenuItem key={range.label} value={range.label}>
+                          {range.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  ) : activeFilter === 'boothName' ? (
                     <TextField
                       select
                       fullWidth
@@ -449,7 +488,25 @@ export default function SearchPage() {
               </CardContent>
             </Card>
 
-            {status && <Alert severity={isError ? 'error' : 'info'}>{status}</Alert>}
+            {isError ? (
+              <Alert severity="error">{status}</Alert>
+            ) : (
+              <TextField
+                fullWidth
+                label="Search"
+                placeholder="Search..."
+                value={filters.voterName}
+                onChange={(e) => setFilters((prev) => ({ ...prev, voterName: e.target.value }))}
+                InputProps={{
+                  startAdornment: (
+                    <Box sx={{ mr: 1, display: 'flex', alignItems: 'center', opacity: 0.5 }}>
+                      <SearchRoundedIcon fontSize="small" />
+                    </Box>
+                  ),
+                }}
+              />
+            )}
+
           </Stack>
         </CardContent>
       </Card>

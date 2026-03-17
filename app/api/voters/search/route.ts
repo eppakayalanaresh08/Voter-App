@@ -33,7 +33,9 @@ export async function GET(req: Request) {
     houseNo: (url.searchParams.get('houseNo') ?? '').trim(),
     epicId: (url.searchParams.get('epicId') ?? '').trim(),
     boothName: (url.searchParams.get('boothName') ?? '').trim(),
-    phoneNumber: (url.searchParams.get('phoneNumber') ?? '').trim()
+    phoneNumber: (url.searchParams.get('phoneNumber') ?? '').trim(),
+    ageMin: url.searchParams.get('ageMin') ? parseInt(url.searchParams.get('ageMin')!, 10) : undefined,
+    ageMax: url.searchParams.get('ageMax') ? parseInt(url.searchParams.get('ageMax')!, 10) : undefined,
   };
 
   const { upload, voters } = await searchAssignedVoters(profile, filters);

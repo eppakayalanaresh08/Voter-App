@@ -13,6 +13,8 @@ export type AssignedVoterSearchFilters = {
   epicId?: string;
   boothName?: string;
   phoneNumber?: string;
+  ageMin?: number;
+  ageMax?: number;
 };
 
 type BoothOption = {
@@ -103,6 +105,8 @@ export async function searchAssignedVoters(
   if (epicId) request = request.ilike('epic_id', `%${epicId}%`);
   if (boothName) request = request.ilike('booth_name', `%${boothName}%`);
   if (phoneNumber) request = request.ilike('mobile_no', `%${phoneNumber}%`);
+  if (filters.ageMin !== undefined && filters.ageMin !== null) request = request.gte('age', filters.ageMin);
+  if (filters.ageMax !== undefined && filters.ageMax !== null) request = request.lte('age', filters.ageMax);
 
   const { data, error } = await request
     .order('booth_no', { ascending: true })

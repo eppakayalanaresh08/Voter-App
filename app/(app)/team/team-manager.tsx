@@ -61,8 +61,8 @@ export default function TeamManager({ upload, initialBoothOptions = [], initialA
       // 1. Load from cache
       const cached = await db.teamCache.get(cacheKey);
       if (cached) {
-        setBoothOptions(cached.boothOptions);
-        setAssignments(cached.assignments);
+        setBoothOptions(cached.boothOptions as BoothOption[]);
+        setAssignments(cached.assignments as TeamAssignmentSummary[]);
         setIsLoading(false);
       }
 

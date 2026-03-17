@@ -71,7 +71,11 @@ export async function POST(req: Request) {
       currentRequest = currentRequest.in('booth_no', scopedBooths);
     }
 
-    const { data: current } = await currentRequest.single();
+    const { data: current, error: currentError } = await currentRequest.single();
+
+    if (currentError) {
+      console.error(`[Sync] Error fetching current voter ${e.voterId}:`, currentError);
+    }
 
     if (!current) continue;
 
@@ -126,7 +130,13 @@ export async function POST(req: Request) {
 
     if (inserts.length > 0) {
       const { error } = await supabase.from('logs').insert(inserts);
-      if (!error) results.logsInserted = inserts.length;
+      if (error) {
+        console.error('[Sync] Error inserting logs into Supabase:', error);
+        // We can also return the error to the client for better visibility
+        return NextResponse.json({ error: `Supabase error: ${error.message}`, details: error }, { status: 500 });
+      } else {
+        results.logsInserted = inserts.length;
+      }
     }
   }
 

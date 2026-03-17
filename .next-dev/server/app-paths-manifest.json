@@ -1,11 +1,9 @@
 {
-  "/api/voters/search/route": "app/api/voters/search/route.js",
-  "/api/home-data/route": "app/api/home-data/route.js",
-  "/page": "app/page.js",
-  "/api/team-data/route": "app/api/team-data/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/api/logs/route": "app/api/logs/route.js",
+  "/(app)/logs/page": "app/(app)/logs/page.js",
   "/(app)/home/page": "app/(app)/home/page.js",
   "/(app)/search/page": "app/(app)/search/page.js",
-  "/(app)/team/page": "app/(app)/team/page.js",
-  "/(app)/logs/page": "app/(app)/logs/page.js",
   "/(app)/search/[id]/page": "app/(app)/search/[id]/page.js"
 }

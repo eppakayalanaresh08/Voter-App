@@ -1,4 +1,4 @@
-// File: C:\Users\eppak\Downloads\newvoter\voter_app\app\(app)\logs\page.tsx
+// File: C:\Users\eppak\Downloads\voter_app\app\(app)\logs\page.tsx
 import * as entry from '../../../../../app/(app)/logs/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

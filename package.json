@@ -3,16 +3,17 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "clean": "if exist .next rd /s /q .next && if exist .next-dev rd /s /q .next-dev && if exist tsconfig.tsbuildinfo del tsconfig.tsbuildinfo && if exist public/sw.js del public/sw.js && if exist public/workbox-*.js del public/workbox-*.js",
-    "clean:dev": "if exist .next-dev rd /s /q .next-dev && if exist tsconfig.tsbuildinfo del tsconfig.tsbuildinfo && if exist public/sw.js del public/sw.js && if exist public/workbox-*.js del public/workbox-*.js",
-    "clean:build": "if exist .next rd /s /q .next && if exist tsconfig.tsbuildinfo del tsconfig.tsbuildinfo && if exist public/sw.js del public/sw.js && if exist public/workbox-*.js del public/workbox-*.js",
-    "dev": "npm run clean:dev && next dev",
-    "build": "npm run clean:build && next build",
+    "clean": "rd /s /q .next .next-dev out 2>nul & del /f /q public\\sw.js public\\workbox-*.js 2>nul & exit 0",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.10",

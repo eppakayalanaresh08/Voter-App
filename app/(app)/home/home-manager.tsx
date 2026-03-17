@@ -210,10 +210,10 @@ export default function HomeManager({ profile }: { profile: AppProfile }) {
       const cached = await db.homeCache.get(cacheKey);
       let skipFetch = false;
       if (cached) {
-        setData({ 
-          banners: cached.banners as FieldContentBanner[], 
+        setData({
+          banners: cached.banners as FieldContentBanner[],
           overview: cached.overview as never,
-          scope: null 
+          scope: null
         });
         setIsLoading(false);
 
@@ -252,7 +252,7 @@ export default function HomeManager({ profile }: { profile: AppProfile }) {
     load();
   }, [profile.tenant_id]);
 
-  const banners: FieldContentBanner[] = data?.banners ?? [];
+  const banners: FieldContentBanner[] = (data?.banners ?? []).filter(b => b.title === 'Home');
   const overview = data?.overview;
   const isAspirant = profile.role === 'ASPIRANT';
   const actionCards = [
@@ -318,7 +318,8 @@ export default function HomeManager({ profile }: { profile: AppProfile }) {
           borderRadius: '24px',
           backgroundColor: 'primary.main',
           borderColor: 'primary.main',
-          color: '#ffffff'
+          color: '#ffffff',
+          minHeight: 180
         }}
       >
         <CardContent sx={{ p: { xs: 2, sm: 2.25 } }}>
@@ -377,13 +378,13 @@ export default function HomeManager({ profile }: { profile: AppProfile }) {
         </CardContent>
       </Card>
 
-      <Grid container spacing={1.5}>
+      {/* <Grid container spacing={1.5}>
         {actionCards.map((card) => (
           <Grid item xs={actionCards.length === 4 ? 6 : 4} key={card.href}>
             <ActionCard href={card.href} title={card.title} caption={card.caption} icon={card.icon} />
           </Grid>
         ))}
-      </Grid>
+      </Grid> */}
 
       <Grid container spacing={1.5}>
         <Grid item xs={6}>

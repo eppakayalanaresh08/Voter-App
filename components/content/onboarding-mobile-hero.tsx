@@ -10,19 +10,7 @@ type OnboardingMobileHeroProps = {
 };
 
 export default function OnboardingMobileHero({ banners }: OnboardingMobileHeroProps) {
-  const slides = banners.filter((banner) => banner.enabled);
-  const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    if (slides.length <= 1) return;
-    const interval = window.setInterval(() => {
-      setActive((previous) => (previous + 1) % slides.length);
-    }, 4000);
-
-    return () => window.clearInterval(interval);
-  }, [slides.length]);
-
-  const slide = slides[active] ?? banners[0];
+  const slide = banners.find((b) => b.enabled) ?? banners[0];
 
   return (
     <Box
@@ -36,23 +24,18 @@ export default function OnboardingMobileHero({ banners }: OnboardingMobileHeroPr
         backgroundColor: '#08152b'
       }}
     >
-      {slides.map((item, index) => (
-        <Box
-          key={`${item.id ?? 'default'}-${index}`}
-          component="img"
-          src={item.imageUrl ?? '/icons/icon-512.png'}
-          alt={item.title || 'ClickVote banner'}
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            opacity: active === index ? 1 : 0,
-            transition: 'opacity 1000ms ease'
-          }}
-        />
-      ))}
+      <Box
+        component="img"
+        src={slide?.imageUrl ?? '/icons/icon-512.png'}
+        alt={slide?.title || 'ClickVote banner'}
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover'
+        }}
+      />
 
       <Box
         sx={{
@@ -73,11 +56,15 @@ export default function OnboardingMobileHero({ banners }: OnboardingMobileHeroPr
           color: '#ffffff'
         }}
       >
-        <Typography variant="h3" sx={{ fontSize: '2.2rem', fontWeight: 700, lineHeight: 1.1, color: '#ffffff' }}>
+        <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.72)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          Campaign Banner
+        </Typography>
+
+        <Typography variant="h3" sx={{ mt: 0.75, fontSize: '2.2rem', fontWeight: 700, lineHeight: 1.1, color: '#ffffff' }}>
           {slide?.title || 'Manage voter data in one place'}
         </Typography>
 
-        <Typography sx={{ mt: 1.5, fontSize: 14, lineHeight: 1.7, color: 'rgba(255,255,255,0.8)' }}>
+        <Typography sx={{ mt: 0.75, fontSize: 14, lineHeight: 1.7, color: 'rgba(255,255,255,0.84)' }}>
           {slide?.subtitle || 'Upload voter records, organize booths, and manage field teams with a simple workflow.'}
         </Typography>
 
@@ -107,23 +94,6 @@ export default function OnboardingMobileHero({ banners }: OnboardingMobileHeroPr
             Create account
           </Button>
         </Stack>
-
-        {slides.length > 1 && (
-          <Stack direction="row" spacing={1} justifyContent="center" sx={{ mt: 3 }}>
-            {slides.map((item, index) => (
-              <Box
-                key={`${item.id ?? 'dot'}-${index}`}
-                sx={{
-                  width: active === index ? 20 : 8,
-                  height: 8,
-                  borderRadius: 999,
-                  backgroundColor: active === index ? '#ffffff' : 'rgba(255,255,255,0.42)',
-                  transition: 'all 200ms ease'
-                }}
-              />
-            ))}
-          </Stack>
-        )}
       </Box>
     </Box>
   );

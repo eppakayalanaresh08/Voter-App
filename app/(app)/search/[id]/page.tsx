@@ -27,6 +27,7 @@ import {
 } from '@/lib/field-content-shared';
 import { appendImageToMessage, renderMessageTemplate } from '@/lib/message-templates';
 import { db, enrich, type OfflineVoter } from '@/lib/offline-db';
+import { syncPending } from '@/lib/offline-sync';
 import { thermalPrinter } from '@/lib/thermal-printer';
 
 type EditableVoterFields = Pick<
@@ -168,7 +169,7 @@ export default function VoterProfilePage() {
     if (!voter) return '';
     return [
       `Hello ${voter.voter_name ?? ''}`,
-      `Booth: ${voter.booth_no ?? '-'}`,
+      `Booth: ${voter.booth_no ?? '-'} - ${voter.booth_name ?? ''}`,
       `EPIC: ${voter.epic_id ?? '-'}`,
       `House No: ${voter.house_no ?? '-'}`,
       `Phone: ${voter.mobile_no ?? '-'}`,
@@ -183,8 +184,18 @@ export default function VoterProfilePage() {
 
   const logAction = async (actionType: string, payload?: unknown) => {
     if (!voter) return;
-    await db.pendingLogs.add({ voterId: voter.id, actionType, payload, createdAt: new Date().toISOString() });
-    setStatus('Saved to logs (offline queue).');
+    try {
+      const res = await fetch('/api/logs/direct', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voterId: voter.id, actionType, payload })
+      });
+      if (!res.ok) throw new Error('Failed to sync log');
+      setStatus('Logged to Supabase.');
+    } catch (error) {
+      console.error('[logAction] failed:', error);
+      setStatus('Log recording failed (Online only).');
+    }
   };
 
   const openEditor = (mode: Exclude<EditorMode, null>) => {
@@ -209,7 +220,8 @@ export default function VoterProfilePage() {
     await db.pendingEdits.add({ voterId: voter.id, patch, baseUpdatedAt: voter.updated_at, createdAt: new Date().toISOString() });
     await db.voters.put(nextVoter);
     setVoter(nextVoter);
-    setStatus('Saved offline. Sync later.');
+    setStatus('Saved offline. Syncing...');
+    void syncPending().then(() => setStatus('Synced to database.'));
   };
 
   const submitEditor = async () => {
@@ -328,11 +340,11 @@ export default function VoterProfilePage() {
               </Typography>
             </Box>
             <Box sx={{ textAlign: 'right' }}>
-              <Typography variant="caption" color="text.secondary">
-                Booth
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                Booth {voter.booth_no ?? '-'}
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                {voter.booth_no ?? '-'}
+              <Typography variant="body2" sx={{ fontWeight: 400, color: 'primary.main', display: 'block' }}>
+                {voter.booth_name || '-'}
               </Typography>
             </Box>
           </Stack>
@@ -353,12 +365,13 @@ export default function VoterProfilePage() {
             sx={{
               mt: 2.5,
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+              gridTemplateColumns: 'repeat(2, 1fr)',
               gap: 1.25
             }}
           >
             <Button
               variant="outlined"
+              fullWidth
               onClick={async () => {
                 if (!voter) return;
                 try {
@@ -385,6 +398,7 @@ export default function VoterProfilePage() {
             </Button>
             <Button
               variant="outlined"
+              fullWidth
               onClick={async () => {
                 try {
                   const blob = await generateVoterCardBlob();
@@ -417,6 +431,7 @@ export default function VoterProfilePage() {
             </Button>
             <Button
               variant="outlined"
+              fullWidth
               onClick={async () => {
                 const phone = (voter.mobile_no ?? '').replace(/\D+/g, '');
                 if (!phone) {
@@ -433,10 +448,9 @@ export default function VoterProfilePage() {
             </Button>
 
             <Button
-              variant="contained"
+              variant="outlined"
               disabled={isSendingWa}
               fullWidth
-              sx={{ gridColumn: { sm: 'span 2' } }}
               onClick={async () => {
                 if (!voter) return;
                 try {
@@ -757,9 +771,11 @@ export default function VoterProfilePage() {
 
               <Grid item xs={6}>
                 <Box sx={{ p: 2, border: '1px solid #e5e7eb', borderRadius: 2 }}>
-                  <Typography sx={{ fontSize: 12, color: '#6b7280' }}>Booth No</Typography>
-                  <Typography sx={{ mt: 0.5, fontSize: 22, fontWeight: 700 }}>
-                    {voter.booth_no ?? '-'}
+                  <Typography sx={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>
+                    Booth {voter.booth_no ?? '-'}
+                  </Typography>
+                  <Typography sx={{ mt: 0.5, fontSize: 16, fontWeight: 400, color: '#1976d2' }}>
+                    {voter.booth_name || '-'}
                   </Typography>
                 </Box>
               </Grid>

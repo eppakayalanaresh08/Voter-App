@@ -1,4 +1,4 @@
-// File: C:\Users\eppak\Downloads\newvoter\voter_app\app\api\voters\search\route.ts
+// File: C:\Users\eppak\Downloads\voter_app\app\api\voters\search\route.ts
 import * as entry from '../../../../../../app/api/voters/search/route.js'
 import type { NextRequest } from 'next/server.js'
 

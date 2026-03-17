@@ -43,8 +43,8 @@ export function getDefaultFieldBanners(): FieldContentBanner[] {
   return [
     {
       id: null,
-      title: 'Manage voter data in one place',
-      subtitle: 'Upload voter records, organize booths, and manage field teams with a simple workflow.',
+      title: 'Home',
+      subtitle: 'Manage voter data in one place with a simple workflow.',
       imagePath: '/icons/icon-512.png',
       imageUrl: '/icons/icon-512.png',
       enabled: true,
@@ -53,22 +53,12 @@ export function getDefaultFieldBanners(): FieldContentBanner[] {
     },
     {
       id: null,
-      title: 'Track booth activity clearly',
-      subtitle: 'Monitor assignments, follow-ups, and campaign movement without messy spreadsheets.',
+      title: 'Onboarding',
+      subtitle: 'Keep booth operations structured with clean access and faster execution.',
       imagePath: '/icons/icon-512.png',
       imageUrl: '/icons/icon-512.png',
       enabled: true,
       sortOrder: 1,
-      updatedAt: null
-    },
-    {
-      id: null,
-      title: 'Give your team better control',
-      subtitle: 'Keep booth operations structured with clean access, simple updates, and faster execution.',
-      imagePath: '/icons/icon-512.png',
-      imageUrl: '/icons/icon-512.png',
-      enabled: true,
-      sortOrder: 2,
       updatedAt: null
     }
   ];
